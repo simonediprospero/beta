@@ -1,4 +1,4 @@
-name: Build and Test Maven Project
+name: Test and Generate JaCoCo Report
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,8 +26,14 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build with Maven
-        run: mvn -B clean install
-
       - name: Test with Maven
         run: mvn -B test
+
+      - name: Generate JaCoCo report
+        run: mvn jacoco:report
+
+      - name: Archive JaCoCo report
+        uses: actions/upload-artifact@v2
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/index.html
